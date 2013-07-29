@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="ArchTools" basedir="." default="build.archtools" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:doxygen="antlib:org.doxygen.tools">
+
+	<property file="build.properties" />
+	<ivy:settings file="ivysettings.xml" />
+
+	<path id="lib.path.id">
+		<fileset dir="${lib.dir}" />
+	</path>
+
+	<target name="increase.revision">
+		<propertyfile file="build.properties">
+			<entry key="build.revision.number" type="int" operation="+" value="1" />
+		</propertyfile>
+	</target>
+
+	<target name="increase.minor">
+		<propertyfile file="build.properties">
+			<entry key="build.minor.number" type="int" operation="+" value="1" />
+			<entry key="build.revision.number" type="int" value="0" />
+		</propertyfile>
+	</target>
+
+	<target name="increase.major">
+		<propertyfile file="build.properties">
+			<entry key="build.major.number" type="int" operation="+" value="1" />
+			<entry key="build.minor.number" type="int" value="0" />
+			<entry key="build.revision.number" type="int" value="0" />
+		</propertyfile>
+	</target>
+
+	<target name="clean">
+		<delete dir="${lib.dir}" />
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<!-- 
+		REQUIRES ADDITIONAL JAR in $ANT_HOME/lib
+		DOWNLOAD IT AT http://ant.apache.org/ivy/download.cgi
+	-->
+	<target name="ivy.cleancache">
+		<ivy:cleancache />
+	</target>
+
+	<target name="ivy.resolve">
+		<mkdir dir="${lib.dir}" />
+		<delete dir="${lib.dir}" includes="**/*" />
+		<ivy:retrieve pattern="${lib.dir}/[artifact]-[revision].[ext]" conf="default" />
+	</target>
+
+	<target name="init" depends="clean,ivy.resolve">
+		<mkdir dir="${build.dir}" />
+		<delete dir="${build.dir}" includes="**/*" />
+		<mkdir dir="${dist.dir}" />
+		<delete dir="${dist.dir}" includes="**/*" />
+
+		<property name="build.number" value="${build.major.number}.${build.minor.number}.${build.revision.number}" />
+		<echo>Revision ${build.number}...</echo>
+	</target>
+
+	<!--
+	project.dir
+	project.name
+	-->
+	<target name="build.jar">
+		<delete dir="${build.dir}" includes="**/*" />
+		<javac srcdir="${project.dir}/src" destdir="${build.dir}" debug="${debug.level}" includeantruntime="false">
+			<classpath refid="lib.path.id" />
+		</javac>
+		<jar jarfile="${dist.dir}/${project.name}-${build.number}.jar">
+			<manifest>
+				<attribute name="Main-Class" value="${project.main.class}" />
+				<attribute name="Version" value="${build.number}" />
+			</manifest>
+			<fileset dir="${build.dir}" />
+			<fileset dir="${project.dir}/conf">
+				<include name="**/*" />
+			</fileset>
+		</jar>
+		<copy file="${dist.dir}/${project.name}-${build.number}.jar" todir="${lib.dir}" />
+		<echo>Built ${project.name} revision ${build.number}...</echo>
+	</target>
+
+	<!--
+	project.dir
+	project.name
+	-->
+	<target name="build.war">
+		<delete dir="${build.dir}" includes="**/*" />
+		<javac srcdir="${project.dir}/src" destdir="${build.dir}" debug="${debug.level}" includeantruntime="false">
+			<classpath refid="lib.path.id" />
+		</javac>
+		<war destfile="${dist.dir}/${project.name}.war" webxml="${project.dir}/web/WEB-INF/web.xml" manifest="${project.dir}/web/META-INF/MANIFEST.MF">
+			<lib dir="${lib.dir}" />
+			<classes dir="${build.dir}" />
+			<classes dir="${project.dir}/conf" />
+			<fileset dir="${project.dir}/web" />
+		</war>
+		<echo>Built ${project.name} revision ${build.number}...</echo>
+	</target>
+
+	<!--
+	ArchTools tasks
+	-->
+	<target name="build.archtools" depends="init">
+		<antcall target="build.jar">
+			<param name="project.dir" value="${basedir}" />
+			<param name="project.name" value="archtools" />
+		</antcall>
+	</target>
+
+</project>

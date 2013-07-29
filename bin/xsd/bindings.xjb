@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings
+	version="2.1"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<jaxb:globalBindings>
+    	<xjc:serializable uid="1" />
+  	</jaxb:globalBindings>
+  	
+  	<!-- Users Schema Bindings -->
+	<jaxb:bindings schemaLocation="users.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="it.eurix.util.user.jaxb"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+  	
+	<!-- Tools Schema Bindings -->
+	<jaxb:bindings schemaLocation="tools.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="it.eurix.util.tool.jaxb"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+			
+	<!-- Workflow Descriptor Schema Bindings -->
+	<jaxb:bindings schemaLocation="workflows.xsd" node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="it.eurix.util.workflow.jaxb"/>
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+	
+</jaxb:bindings>
